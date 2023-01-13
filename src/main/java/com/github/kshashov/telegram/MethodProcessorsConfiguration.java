@@ -6,10 +6,14 @@ import com.github.kshashov.telegram.handler.processor.arguments.BotRequestMethod
 import com.github.kshashov.telegram.handler.processor.response.BotBaseRequestMethodProcessor;
 import com.github.kshashov.telegram.handler.processor.response.BotHandlerMethodReturnValueHandler;
 import com.github.kshashov.telegram.handler.processor.response.BotResponseBodyMethodProcessor;
+import com.github.kshashov.telegram.handler.processor.response.BotTemplateMethodProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.core.convert.ConversionService;
+import org.thymeleaf.ITemplateEngine;
 
 @Configuration
 public class MethodProcessorsConfiguration {
@@ -30,9 +34,17 @@ public class MethodProcessorsConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(BotTemplateMethodProcessor.class)
+    @ConditionalOnClass(ITemplateEngine.class)
+    public BotHandlerMethodReturnValueHandler botTemplateMethodProcessor(ITemplateEngine templateEngine) {
+        return new BotTemplateMethodProcessor(templateEngine);
+    }
+
+    @Bean
     public BotHandlerMethodReturnValueHandler botResponseBodyMethodProcessor(ConversionService conversionService) {
         return new BotResponseBodyMethodProcessor(conversionService);
     }
+
 
     @Bean
     public ConversionService conversionService() {

@@ -67,6 +67,11 @@ public enum MessageType {
     POLL,
 
     /**
+     * Used when {@link Update#myChatMember()} is not null for the current telegram request.
+     */
+    MY_CHAT_MEMBER,
+
+    /**
      * For new types of telegram requests that are not yet supported.
      */
     UNSUPPORTED

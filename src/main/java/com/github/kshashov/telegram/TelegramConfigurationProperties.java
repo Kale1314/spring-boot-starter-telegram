@@ -33,5 +33,10 @@ public class TelegramConfigurationProperties {
      * HTTP port that will be used to start embedded web server if webhooks is enabled.
      */
     private int serverPort = 8443;
+
+    /**
+     * 主机器人令牌
+     */
+    private String primaryBotToken = null;
 }
 

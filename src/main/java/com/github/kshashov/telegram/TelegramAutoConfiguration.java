@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
+import org.thymeleaf.ITemplateEngine;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -144,6 +146,21 @@ public class TelegramAutoConfiguration implements BeanFactoryPostProcessor, Envi
         return defaultBuilder.build();
     }
 
+
+    @Bean
+    TelegramBot telegramBot(TelegramBotGlobalProperties telegramBotGlobalProperties) {
+        return new TelegramBot(telegramBotGlobalProperties.getPrimaryBotToken());
+    }
+
+    @Bean
+    TelegramExecuteHandler telegramExecuteHandler(TelegramBot telegramBot,
+                                                  @Autowired(required = false)
+                                                  ITemplateEngine templateEngine,
+                                                  TelegramBotGlobalProperties telegramBotGlobalProperties,
+                                                  MetricsService metricsService) {
+        return new DefaultTelegramExecuteHandler(telegramBot, templateEngine, telegramBotGlobalProperties, metricsService);
+    }
+
     @Bean
     TelegramSessionResolver telegramSessionResolver(ApplicationContext context) {
         return new TelegramSessionResolver(context);
@@ -207,6 +224,7 @@ public class TelegramAutoConfiguration implements BeanFactoryPostProcessor, Envi
                 .argumentResolvers(argumentResolvers)
                 .returnValueHandlers(returnValueHandlers)
                 .setWebserverPort(properties.getServerPort())
+                .primaryBotToken(properties.getPrimaryBotToken())
                 .taskExecutor(new ThreadPoolExecutor(properties.getCorePoolSize(), properties.getMaxPoolSize(), 0L, TimeUnit.SECONDS, new SynchronousQueue<>()))
                 .responseCallback(new Callback() {
                     @Override

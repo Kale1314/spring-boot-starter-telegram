@@ -84,7 +84,10 @@ public class TelegramEvent {
         if (message != null) {
             this.user = firstNonNull(message.from(), message.leftChatMember(), message.forwardFrom());
             this.chat = firstNonNull(message.chat(), message.forwardFromChat());
-            this.text = message.text();
+            String text = message.text();
+            if (text.contains("@")) {
+                text = text.substring(0, text.indexOf("@"));
+            }
             if (update.editedMessage() != null) {
                 this.messageType = MessageType.EDITED_MESSAGE;
             } else if (update.channelPost() != null) {
@@ -94,6 +97,7 @@ public class TelegramEvent {
             } else {
                 this.messageType = MessageType.MESSAGE;
             }
+            this.text = text;
         } else if (update.inlineQuery() != null) {
             InlineQuery inlineQuery = update.inlineQuery();
             this.user = inlineQuery.from();
@@ -129,6 +133,14 @@ public class TelegramEvent {
             this.text = update.poll().question();
             this.chat = null;
             this.messageType = MessageType.POLL;
+        } else if (update.myChatMember() != null) {
+            ChatMemberUpdated chatMemberUpdated = update.myChatMember();
+            this.user = chatMemberUpdated.from();
+            this.chat = chatMemberUpdated.chat();
+            ChatMember.Status oldStatus = update.myChatMember().oldChatMember().status();
+            ChatMember.Status newStatus = update.myChatMember().newChatMember().status();
+            this.text = oldStatus + " -> " + newStatus;
+            this.messageType = MessageType.MY_CHAT_MEMBER;
         } else {
             this.user = null;
             this.text = null;

@@ -104,4 +104,24 @@ public class TelegramWebhookService implements TelegramService {
             telegramBot.execute(new DeleteWebhook());
         }
     }
+
+    /**
+     * 加载 bot
+     *
+     * @return bot
+     */
+    @Override
+    public TelegramBot bot() {
+        return telegramBot;
+    }
+
+    /**
+     * 加载bot token
+     *
+     * @return token
+     */
+    @Override
+    public String token() {
+        return telegramBot.getToken();
+    }
 }

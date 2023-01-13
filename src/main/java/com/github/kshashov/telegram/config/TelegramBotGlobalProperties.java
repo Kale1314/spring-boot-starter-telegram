@@ -30,6 +30,9 @@ public class TelegramBotGlobalProperties {
     private final @NotNull Map<String, Consumer<TelegramBotProperties.Builder>> botProperties;
     private final @NotNull Map<String, Consumer<TelegramBot>> botProcessors;
 
+
+    private final String primaryBotToken;
+
     public static Builder builder() {
         return new Builder();
     }
@@ -43,6 +46,8 @@ public class TelegramBotGlobalProperties {
         private List<BotHandlerMethodArgumentResolver> argumentResolvers;
         private List<BotHandlerMethodReturnValueHandler> returnValueHandlers;
         private int webserverPort;
+
+        private String primaryBotToken;
 
         public Builder taskExecutor(@NotNull ThreadPoolExecutor taskExecutor) {
             this.taskExecutor = taskExecutor;
@@ -119,6 +124,17 @@ public class TelegramBotGlobalProperties {
         }
 
         /**
+         * 主机器人 令牌
+         *
+         * @param token 令牌
+         * @return Builder
+         */
+        public Builder primaryBotToken(@NotNull String token) {
+            this.primaryBotToken = token;
+            return this;
+        }
+
+        /**
          * @param webserverPort HTTP port that will be used to start embedded web server if webhooks is enabled. Default value is 8443.
          * @return current instance
          */
@@ -128,7 +144,7 @@ public class TelegramBotGlobalProperties {
         }
 
         public TelegramBotGlobalProperties build() {
-            return new TelegramBotGlobalProperties(webserverPort, taskExecutor, matcherStrategy, responseCallback, argumentResolvers, returnValueHandlers, botProperties, botProcessors);
+            return new TelegramBotGlobalProperties(webserverPort, taskExecutor, matcherStrategy, responseCallback, argumentResolvers, returnValueHandlers, botProperties, botProcessors, primaryBotToken);
         }
     }
 }
